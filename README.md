@@ -29,6 +29,25 @@ python train.py \
 ```
 
 
+### 13B 8node 4 Pipeline Parallel stage example 
+
+```
+#!/bin/bash
+
+python train.py \
+  --model-name-or-path [YOUT_PATH_TO_MODEL] \
+  --batch-size 1024 \
+  --lr 1e-4 \
+  --use-pipeline \
+  --split-layers 9 19 29 \
+  --num-micro-batches 64 \
+  --bfloat16 \
+  --block-size 4096 \
+  --distribute-parameter \
+  --enable-activation-recomputation
+```
+
+
 ### 33B 12node 6 Pipeline Parallel stage example 
 
 ```
