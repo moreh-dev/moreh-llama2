@@ -566,9 +566,6 @@ class LlamaModel(LlamaPreTrainedModel):
         self.layers = nn.ModuleList([LlamaDecoderLayer(config) for _ in range(config.num_hidden_layers)])
         self.norm = LlamaRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 
-        self.use_pipeline = config.use_pipeline
-        self.split_layers = config.split_layers
-
         self.gradient_checkpointing = False
         # Initialize weights and apply final processing
         self.post_init()
@@ -709,10 +706,6 @@ class LlamaModel(LlamaPreTrainedModel):
             
             hidden_states = layer_outputs[0]
             
-            # to apply Moreh Pipeline Parallel
-            if self.use_pipeline and idx in self.split_layers:
-                hidden_states = torch.moreh.pipeline_assign(hidden_states)
-
             if use_cache:
                 next_decoder_cache += (layer_outputs[2 if output_attentions else 1],)
 
