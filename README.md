@@ -1,35 +1,27 @@
 # Moreh LLaMA2 Alpaca fine-tuning example
-## Prerequisite
+## 준비 사항
 
-Hugging Face format 으로 변환된 모델 & tokenizer 가 필요합니다.
+Moreh LLaMA2를 사용해 학습/추론하기 위해서 모델 체크포인트 및 토크나이저를 준비해야합니다.     
+이 때 체크포인트는 Hugging Face 형식으로 변환된 것이어야합니다.       
+이에 대한 자세한 내용은 Hugging Face의 [Docs](https://huggingface.co/docs/transformers/en/model_doc/llama2)를 참고하시면 좋습니다.     
 
-## Install Dependeicies
 
-```
+## Dependencies 설치
+
+Moreh LLaMA2를 사용하기 위해 환경 세팅을 합니다.
+
+
+```shell
 pip install -r requirements.txt
 ```
 
-## How To Run
+## 학습 실행
 
-### 7B 4node 2 Pipeline Parallel stage example 
+### LLaMA2 7B 모델 학습 예제
 
-```
-#!/bin/bash
-
-python train.py \
-  --model-name-or-path [YOUT_PATH_TO_MODEL] \
-  --batch-size 1024 \
-  --lr 1e-4 \
-  --use-pipeline \
-  --split-layers 15 \
-  --num-micro-batches 32 \
-  --bfloat16 \
-  --block-size 2048 \
-  --distribute-parameter
-```
-
-
-### 13B 8node 4 Pipeline Parallel stage example 
+아래의 스크립트를 사용해 모델을 학습시킬 수 있습니다.     
+train.py 코드에는 모델을 병렬화하는 Moreh의 Advanced Parallelization 기법이 적용되어있어,      
+사용자는 사용할 노드 수(SDA 모델)만 미리 설정해두면 별도의 병렬화 필요없이 LLaMA2 모델을 학습시킬 수 있습니다. 
 
 ```
 #!/bin/bash
@@ -38,50 +30,9 @@ python train.py \
   --model-name-or-path [YOUT_PATH_TO_MODEL] \
   --batch-size 1024 \
   --lr 1e-4 \
-  --use-pipeline \
-  --split-layers 9 19 29 \
-  --num-micro-batches 64 \
-  --bfloat16 \
-  --block-size 4096 \
-  --distribute-parameter \
-  --enable-activation-recomputation
+  --block-size 2048 
 ```
 
-
-### 33B 12node 6 Pipeline Parallel stage example 
-
-```
-#!/bin/bash
-
-python train.py \
-  --model-name-or-path [YOUT_PATH_TO_MODEL] \
-  --batch-size 1024 \
-  --lr 1e-4 \
-  --use-pipeline \
-  --split-layers 9 19 29 39 49 \
-  --num-micro-batches 32 \
-  --bfloat16 \
-  --block-size 2048 \
-  --distribute-parameter \
-  --enable-activation-recomputation
-```
-### 70B 24node 12 Pipeline Parallel stage example 
-
-```
-#!/bin/bash
-
-python train.py \
-  --model-name-or-path [YOUT_PATH_TO_MODEL] \
-  --batch-size 1024 \
-  --lr 1e-4 \
-  --use-pipeline \
-  --split-layers 6 13 20 27 34 41 48 55 61 67 73 \
-  --num-micro-batches 32 \
-  --bfloat16 \
-  --block-size 2048 \
-  --distribute-parameter \
-  --enable-activation-recomputation
-```
 
 ## Arguments
 | Parameter|Type| Default| Description|	
@@ -89,8 +40,5 @@ python train.py \
 | --model-name-or-path | str  | | model name or path |
 | --batch-size | int  | 8 | number of examples for each training iteration |
 | --lr  | float  | 0.00001 | learning rate |
-| --bfloat16 | bool  | false | whether to use bfloat16 |
-| --distribute-parameter | bool  | false | whether to distribute fp32 master parameters |
-| --num-micro-batches | int  | 1 | split batch to N steps (micro batches) |
 | --log-interval | int  | 10 |logging interval|
 | --save-model-dir | str  | ./ | path to save model at the end of training |
